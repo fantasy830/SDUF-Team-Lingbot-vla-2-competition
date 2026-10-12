@@ -2,9 +2,9 @@
 
 ```bash
 hf download Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k \
-  --include 'resume_dcp/*' 'manifest.json' 'README.md' \
+  --include 'resume_dcp/*' --include 'manifest.json' --include 'README.md' \
   --local-dir ./models/sduf-10k
-python scripts/verify_download.py ./models/sduf-10k
+python scripts/verify_download.py ./models/sduf-10k --package resume
 ```
 
 `resume_dcp/global_step_10000` 内的 `model/`、`optimizer/`、`extra_state/` 是一套完整保存状态，不能只下载某张卡的 distcp 文件。此模型为全参数 AdamW，8 rank FSDP2；更换GPU数量或Torch版本前需验证分片加载与rank状态兼容性。

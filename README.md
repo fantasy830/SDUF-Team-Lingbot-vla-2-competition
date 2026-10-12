@@ -10,7 +10,7 @@
 | `resume_dcp/` | `global_step_10000/{model,optimizer,extra_state}`、原训练配置、model_assets | 在兼容环境中恢复完整训练状态 |
 | `qwen3vl_config_tokenizer/` | Qwen3-VL-4B-Instruct 的架构与处理器配置，不含另一份 Qwen 权重 | LingBot 加载器的配置依赖 |
 
-完整 DCP 为 **76.589 GB / 71.329 GiB**（文件字节合计）。模型含 6,375,907,511 个张量元素；FP32 权重数据为 **25.504 GB / 23.752 GiB**，导出包另含少量配置。小写 GB 按十进制，GiB 按二进制。目录清单与实际 SHA256 见 HF 的 `manifest.json`。
+完整 DCP 原件为 **76.589 GB / 71.329 GiB**（文件字节合计）；加配套配置与 model_assets 的续训共享目录为 **76.604 GB**。模型含 6,375,907,511 个张量元素；FP32 权重数据为 **25.504 GB / 23.752 GiB**，本次推理目录含配置实际 **25.520 GB**。另有 **15.887 MB** Qwen架构/tokenizer依赖，整体共享文件约 **102.140 GB**。GB 按十进制，GiB 按二进制。目录清单与实际 SHA256 见 HF 的 `manifest.json`。
 
 ## 训练记录
 

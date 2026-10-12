@@ -4,7 +4,8 @@
 
 ```bash
 hf download Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k \
-  --include 'inference_fp32/*' 'qwen3vl_config_tokenizer/*' 'manifest.json' 'README.md' \
+  --include 'inference_fp32/*' --include 'qwen3vl_config_tokenizer/*' \
+  --include 'manifest.json' --include 'README.md' \
   --local-dir ./models/sduf-10k
 ```
 

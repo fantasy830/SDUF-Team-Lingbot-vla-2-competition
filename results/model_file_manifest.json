@@ -3,23 +3,23 @@
   "exact_tensor_equality_verified": true,
   "tensor_count": 1708,
   "totals_bytes": {
-    "README.md": 5205,
-    "inference_fp32": 25520005046,
+    "README.md": 5614,
+    "inference_fp32": 25520005080,
     "provenance.json": 969,
     "qwen3vl_config_tokenizer": 15886528,
-    "resume_dcp": 76604485931
+    "resume_dcp": 76604485968
   },
-  "total_bytes": 102140383679,
+  "total_bytes": 102140384159,
   "files": [
     {
       "path": "README.md",
-      "size": 5205,
-      "sha256": "764f2b6243172ef47f5eb4eb9cb4dacca605a38de1fa8c51be4baca84612dbf5"
+      "size": 5614,
+      "sha256": "aa3bd3ee222bf18a5c03beea91653dcffebc2bdffc16206c07f5d61682cda5e2"
     },
     {
       "path": "inference_fp32/README.md",
-      "size": 2978,
-      "sha256": "103ec44f9148e91fafb36dc5867ff5d8f15d8a21c68e7cdab15434ae15ff0ee6"
+      "size": 3012,
+      "sha256": "e48c9a1ef2e2dcbd412c63c16506511260dc0d7d26f803ef2e3542f5223ae055"
     },
     {
       "path": "inference_fp32/export_verification.json",
@@ -183,8 +183,8 @@
     },
     {
       "path": "resume_dcp/README.md",
-      "size": 2270,
-      "sha256": "4d2d07a58482ff8fdd14637f5d4f2c07bdcc60f03672f3dc5a111a8c5042a25e"
+      "size": 2307,
+      "sha256": "706122095c49d5edf3e29e842b0e4a9ac19bb0eceb73bb4d22e6d50808236505"
     },
     {
       "path": "resume_dcp/global_step_10000/.backup_complete",
