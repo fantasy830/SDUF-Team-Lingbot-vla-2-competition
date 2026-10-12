@@ -1,0 +1,19 @@
+{
+  "global_step": 10000,
+  "base_model": "robbyant/lingbot-vla-v2-6b",
+  "training_source_commit": "951475ae1b1d87553e7dc47c97b53a3d695c0d13",
+  "export_script_source_commit": "ecca77bb259b9592d5fc0eb2b4972d4a236ed2c8",
+  "parameter_storage_dtype": "float32",
+  "training_enable_fp32": false,
+  "optimizer": "adamw",
+  "global_batch_size": 256,
+  "micro_batch_size": 16,
+  "gradient_accumulation_steps": 2,
+  "archive_eval_status": "diagnostic; 913 actual policy episodes per run",
+  "norm_stats_sha256": "488ec6569c30dd69419358241efdb2e6c3488117768e7028a1e891be83e10db8",
+  "robot_config_sha256": "2c2a26509fc9662a8ada64adaa7fa959627dd6dadc6b48b680c4285da2d8ffd8",
+  "training_config_sha256": "ee1fcb4164b7ac85720e148cacf4568e4572b3897258291d4a20ec745e25bf66",
+  "qwen_architecture_source": "local cached Qwen/Qwen3-VL-4B-Instruct config.json",
+  "tokenizer_processor_source": "original 10k training model_assets",
+  "closed_loop_retested_after_fp32_export": false
+}

@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.env
+.cache/
+checkpoints/
+hf_ckpt/
+*.safetensors
+*.distcp
+*.pt
+*.pth
+*.bin
+*.log
+*.tfevents.*
+data/
+runtime/

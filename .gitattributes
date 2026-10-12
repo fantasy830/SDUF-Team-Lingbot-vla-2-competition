@@ -1,0 +1,3 @@
+*.csv whitespace=cr-at-eol
+*.xlsx binary
+configs/robot_configs/robotwin.yaml whitespace=-blank-at-eol

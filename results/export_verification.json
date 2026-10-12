@@ -1,0 +1,41 @@
+{
+  "global_step": 10000,
+  "tensor_count": 1708,
+  "tensor_elements": 6375907511,
+  "tensor_bytes": 25503630044,
+  "dtype": "float32",
+  "source_format": "pytorch_dcp",
+  "exact_tensor_equality_verified": true,
+  "files": [
+    {
+      "file": "model-00001-of-00006.safetensors",
+      "size": 4947507248,
+      "sha256": "bafff26a10cc2539f6568428eb4f78332373d9f87f33a50fff051fb47251a5ca"
+    },
+    {
+      "file": "model-00002-of-00006.safetensors",
+      "size": 4944315304,
+      "sha256": "44caf6009dec81bbb76259fbae540b6d310f52e2f06b6a67e9a593f14f229184"
+    },
+    {
+      "file": "model-00003-of-00006.safetensors",
+      "size": 4944315360,
+      "sha256": "ade247f2428f1b2d0cf1e2d3ddbc84c792df3590a0bc99668676b753a050fc16"
+    },
+    {
+      "file": "model-00004-of-00006.safetensors",
+      "size": 4992858968,
+      "sha256": "f89d4ffc9aecb1e9a3e6926a1c44111c5881f2051862a98a9f809bc0e5b3018b"
+    },
+    {
+      "file": "model-00005-of-00006.safetensors",
+      "size": 4963062048,
+      "sha256": "0fdd97d2c1a98a0273a46786ac4902771159936786f4d309681023ed59b3ec7a"
+    },
+    {
+      "file": "model-00006-of-00006.safetensors",
+      "size": 711830844,
+      "sha256": "0df99860147db7e9fa379c196a26b5245dd5fd7265b3319f041eebe830f5299a"
+    }
+  ]
+}
