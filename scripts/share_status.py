@@ -38,7 +38,7 @@ for item in manifest['files']:
         continue
 total = manifest['total_bytes']
 print(f'Files hashed: {hashed}/{len(manifest["files"])}')
-print(f'Files uploaded: {uploaded}; committed: {committed}')
+print(f'Large-file pre-uploads confirmed: {uploaded}; files committed (including configs): {committed}')
 print(f'Confirmed pre-uploaded logical file size: {uploaded_bytes/1e9:.3f}/{total/1e9:.3f} GB ({uploaded_bytes/total:.1%})')
 print(f'Committed logical file size: {committed_bytes/1e9:.3f}/{total/1e9:.3f} GB ({committed_bytes/total:.1%})')
 print('This counts complete files; an in-progress large file is not included yet. Xet wire bytes can differ.')
