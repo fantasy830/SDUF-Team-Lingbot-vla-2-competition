@@ -7,10 +7,13 @@ verified FP32 package. Check remote file sizes against the completed manifest.
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import time
 
+os.environ.setdefault('HF_HUB_DISABLE_PROGRESS_BARS', '1')
 from huggingface_hub import HfApi
+import huggingface_hub._upload_large_folder as large_upload
 
 
 def main():
@@ -19,15 +22,22 @@ def main():
     parser.add_argument('--stage', type=Path, required=True)
     parser.add_argument('--status-json', type=Path, required=True)
     parser.add_argument('--workers', type=int, default=4)
+    parser.add_argument('--xet-batch-files', type=int, default=8)
     args = parser.parse_args()
     api = HfApi()
     info = api.repo_info(args.repo_id, repo_type='model')
     if info.private:
         raise ValueError('Expected an already-authorized public repository')
+    if args.xet_batch_files < 1 or not hasattr(large_upload, 'UPLOAD_BATCH_SIZE_XET'):
+        raise ValueError('Unsupported huggingface_hub version or invalid Xet batch size')
+    # HF's default batch is 256 files: one delayed file can keep the entire
+    # batch uncommitted. Preserve the resumable cache, but bound upload batches.
+    large_upload.UPLOAD_BATCH_SIZE_XET = args.xet_batch_files
 
     def status(phase, **extra):
         value = {'phase': phase, 'repo_id': args.repo_id,
-                 'updated_utc': datetime.now(timezone.utc).isoformat(), **extra}
+                 'updated_utc': datetime.now(timezone.utc).isoformat(),
+                 'pid': os.getpid(), 'xet_batch_files': args.xet_batch_files, **extra}
         args.status_json.parent.mkdir(parents=True, exist_ok=True)
         args.status_json.write_text(json.dumps(value, indent=2) + '\n')
         print(json.dumps(value), flush=True)
