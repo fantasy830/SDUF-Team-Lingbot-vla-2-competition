@@ -12,6 +12,8 @@ parser.add_argument('--log', type=Path)
 args = parser.parse_args()
 status = json.loads(args.status_json.read_text()) if args.status_json.is_file() else {'phase':'starting'}
 print('Phase:',status.get('phase'))
+if status.get('transport'):
+    print('Transport:',status['transport'])
 if status.get('error'):
     print('Error:', status['error'])
 manifest = json.loads((args.stage/'manifest.json').read_text())

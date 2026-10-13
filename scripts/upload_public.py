@@ -13,6 +13,7 @@ import time
 
 os.environ.setdefault('HF_HUB_DISABLE_PROGRESS_BARS', '1')
 from huggingface_hub import HfApi
+from huggingface_hub import constants as hub_constants
 import huggingface_hub._upload_large_folder as large_upload
 
 
@@ -23,7 +24,11 @@ def main():
     parser.add_argument('--status-json', type=Path, required=True)
     parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--xet-batch-files', type=int, default=8)
+    parser.add_argument('--transport', choices=['xet', 'lfs'], default='xet')
     args = parser.parse_args()
+    if args.transport == 'lfs':
+        os.environ['HF_HUB_DISABLE_XET'] = '1'
+        hub_constants.HF_HUB_DISABLE_XET = True
     api = HfApi()
     info = api.repo_info(args.repo_id, repo_type='model')
     if info.private:
@@ -37,7 +42,8 @@ def main():
     def status(phase, **extra):
         value = {'phase': phase, 'repo_id': args.repo_id,
                  'updated_utc': datetime.now(timezone.utc).isoformat(),
-                 'pid': os.getpid(), 'xet_batch_files': args.xet_batch_files, **extra}
+                 'pid': os.getpid(), 'xet_batch_files': args.xet_batch_files,
+                 'transport': args.transport, **extra}
         args.status_json.parent.mkdir(parents=True, exist_ok=True)
         args.status_json.write_text(json.dumps(value, indent=2) + '\n')
         print(json.dumps(value), flush=True)
