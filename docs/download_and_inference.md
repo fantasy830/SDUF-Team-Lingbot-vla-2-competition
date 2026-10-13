@@ -3,13 +3,13 @@
 ## 只下载 10k 推理包
 
 ```bash
-hf download Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k \
-  --include 'inference_fp32/*' --include 'qwen3vl_config_tokenizer/*' \
-  --include 'manifest.json' --include 'README.md' \
+hf download Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k-fp32 \
   --local-dir ./models/sduf-10k
 ```
 
-权重路径为 `models/sduf-10k/inference_fp32/hf_ckpt`。需要全部 safetensors 分片、索引和配套配置。用 `scripts/verify_download.py ./models/sduf-10k` 校验已下载文件；该命令报告未下载的其他用途文件为 skipped，并对已下载文件执行 SHA256 校验。
+新仓库权重直接位于 `models/sduf-10k/` 根目录。需要全部6个 safetensors 分片、索引和配套配置。用 `scripts/verify_download.py ./models/sduf-10k` 校验已下载文件；根目录格式会要求清单中的完整推理包。上传未完成时不能直接评测。
+
+`configure_runtime.py` 同时支持新根目录格式和原本地 `inference_fp32/hf_ckpt` 格式。新包不含优化器，完整状态续训仍需另一仓库的 `resume_dcp/`。它使用 LingBot 自定义模型实现，并非可随意用任意 Transformers AutoModel 直接运行。
 
 准备 LingBot 源码及对应的 Torch、Transformers、Flash Attention/MoE 等依赖。历史训练源 SHA 为 `951475ae1b1d87553e7dc47c97b53a3d695c0d13`；优先使用其配套部署实现，不随意切换新版架构。使用 AMD 时还要安装 AMD 适配代码；使用 CUDA 时需要对应的 CUDA 依赖。
 

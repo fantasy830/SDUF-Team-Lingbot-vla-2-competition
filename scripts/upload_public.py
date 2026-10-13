@@ -25,14 +25,11 @@ def main():
     parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--xet-batch-files', type=int, default=8)
     parser.add_argument('--transport', choices=['xet', 'lfs'], default='xet')
+    parser.add_argument('--package', choices=['all', 'resume', 'inference-root'], default='all')
     args = parser.parse_args()
     if args.transport == 'lfs':
         os.environ['HF_HUB_DISABLE_XET'] = '1'
         hub_constants.HF_HUB_DISABLE_XET = True
-    api = HfApi()
-    info = api.repo_info(args.repo_id, repo_type='model')
-    if info.private:
-        raise ValueError('Expected an already-authorized public repository')
     if args.xet_batch_files < 1 or not hasattr(large_upload, 'UPLOAD_BATCH_SIZE_XET'):
         raise ValueError('Unsupported huggingface_hub version or invalid Xet batch size')
     # HF's default batch is 256 files: one delayed file can keep the entire
@@ -43,32 +40,43 @@ def main():
         value = {'phase': phase, 'repo_id': args.repo_id,
                  'updated_utc': datetime.now(timezone.utc).isoformat(),
                  'pid': os.getpid(), 'xet_batch_files': args.xet_batch_files,
-                 'transport': args.transport, **extra}
+                 'transport': args.transport, 'package': args.package, **extra}
         args.status_json.parent.mkdir(parents=True, exist_ok=True)
         args.status_json.write_text(json.dumps(value, indent=2) + '\n')
         print(json.dumps(value), flush=True)
 
     try:
-        status('uploading_resume')
-        api.upload_large_folder(args.repo_id, folder_path=args.stage, repo_type='model',
-                                allow_patterns=['resume_dcp/*', 'qwen3vl_config_tokenizer/*',
-                                                'README.md', 'provenance.json'],
-                                num_workers=args.workers, print_report_every=60)
-        status('waiting_for_verified_export')
+        status('connecting')
+        api = HfApi()
+        info = api.repo_info(args.repo_id, repo_type='model')
+        if info.private:
+            raise ValueError('Expected an already-authorized public repository')
         manifest_path = args.stage / 'manifest.json'
-        deadline = time.monotonic() + 6 * 3600
-        while not manifest_path.is_file():
-            if time.monotonic() > deadline:
-                raise TimeoutError('No complete export manifest after six hours; inspect export log')
-            time.sleep(15)
+        if args.package == 'all':
+            status('uploading_resume')
+            api.upload_large_folder(args.repo_id, folder_path=args.stage, repo_type='model',
+                                    allow_patterns=['resume_dcp/*', 'qwen3vl_config_tokenizer/*',
+                                                    'README.md', 'provenance.json'],
+                                    num_workers=args.workers, print_report_every=60)
+            status('waiting_for_verified_export')
+            deadline = time.monotonic() + 6 * 3600
+            while not manifest_path.is_file():
+                if time.monotonic() > deadline:
+                    raise TimeoutError('No complete export manifest after six hours; inspect export log')
+                time.sleep(15)
+            patterns = ['inference_fp32/*', 'manifest.json', 'README.md', 'provenance.json']
+        else:
+            patterns = ['*'] if args.package == 'inference-root' else [
+                'resume_dcp/*', 'qwen3vl_config_tokenizer/*', 'manifest.json', 'README.md', 'provenance.json']
         manifest = json.loads(manifest_path.read_text())
         if not manifest.get('exact_tensor_equality_verified'):
             raise ValueError('Missing export equality verification')
-        status('uploading_verified_inference')
+        if args.package != 'all' and manifest.get('package') != args.package:
+            raise ValueError('Manifest package does not match requested upload scope')
+        status('uploading_resume' if args.package == 'resume' else 'uploading_verified_inference')
         api.upload_large_folder(args.repo_id, folder_path=args.stage, repo_type='model',
-                                allow_patterns=['inference_fp32/*', 'manifest.json',
-                                                'README.md', 'provenance.json'],
-                                num_workers=args.workers, print_report_every=60)
+                                allow_patterns=patterns, num_workers=args.workers,
+                                print_report_every=60)
         status('checking_remote_file_sizes')
         remote = {x.path: x.size for x in api.list_repo_tree(args.repo_id, repo_type='model',
                                                           recursive=True) if hasattr(x, 'size')}

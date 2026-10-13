@@ -2,7 +2,8 @@
 
 ```bash
 hf download Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k \
-  --include 'resume_dcp/*' --include 'manifest.json' --include 'README.md' \
+  --include 'resume_dcp/*' --include 'qwen3vl_config_tokenizer/*' \
+  --include 'manifest.json' --include 'provenance.json' --include 'README.md' \
   --local-dir ./models/sduf-10k
 python scripts/verify_download.py ./models/sduf-10k --package resume
 ```
@@ -10,6 +11,8 @@ python scripts/verify_download.py ./models/sduf-10k --package resume
 `resume_dcp/global_step_10000` 内的 `model/`、`optimizer/`、`extra_state/` 是一套完整保存状态，不能只下载某张卡的 distcp 文件。此模型为全参数 AdamW，8 rank FSDP2；更换GPU数量或Torch版本前需验证分片加载与rank状态兼容性。
 
 `resume_dcp/lingbotvla_cli.yaml`、`model_assets/` 保存训练配置和模型资产。还需要：允许的 clean 数据与清单、Qwen配置/tokenizer、LingBot基座/训练教师依赖、匹配训练源码与AMD或CUDA环境。这些依赖不是优化器checkpoint的一部分。
+
+约25.54GB的FP32推理权重单独放在 `Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k-fp32`。它可用于加载评测或从权重初始化新微调，但不包含这里的AdamW状态，不能将两种启动方式混称为完整恢复训练。
 
 准备环境和新输出目录后，在兼容版本中使用 `enable_resume=true` 与 `load_checkpoint_path=<完整10k目录>`。先查看对应版本训练入口的参数格式，不能将这里的字段名未经核对直接作为某版本的CLI参数。
 

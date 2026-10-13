@@ -15,16 +15,24 @@ def main():
     bundle, source, output = args.bundle.resolve(), args.source_root.resolve(), args.output.resolve()
     if output.exists():
         raise FileExistsError('Choose a new output directory: ' + str(output))
-    model = bundle / 'inference_fp32/hf_ckpt'
+    flat = (bundle / 'model.safetensors.index.json').is_file()
+    assets = bundle if flat else bundle / 'inference_fp32'
+    model = bundle if flat else assets / 'hf_ckpt'
     qwen = bundle / 'qwen3vl_config_tokenizer'
     if not (model / 'model.safetensors.index.json').is_file() or not (qwen / 'config.json').is_file():
-        raise FileNotFoundError('Download inference_fp32 and qwen3vl_config_tokenizer first')
+        raise FileNotFoundError('Download the complete FP32 model and qwen3vl_config_tokenizer first')
+    import json
+    index = json.loads((model / 'model.safetensors.index.json').read_text())
+    for shard in set(index['weight_map'].values()):
+        path = (model / shard).resolve()
+        if not path.is_relative_to(model) or not path.is_file():
+            raise FileNotFoundError('Missing or unsafe model shard: ' + shard)
     if not (source / 'deploy/lingbot_vla_v2_policy.py').is_file():
         raise FileNotFoundError('Invalid LingBot source root')
-    config = yaml.safe_load((bundle / 'inference_fp32/lingbotvla_cli.yaml').read_text())
+    config = yaml.safe_load((assets / 'lingbotvla_cli.yaml').read_text())
     output.mkdir(parents=True)
-    shutil.copytree(bundle / 'inference_fp32/robot_configs', output / 'robot_configs')
-    shutil.copytree(bundle / 'inference_fp32/norm_stats', output / 'norm_stats')
+    shutil.copytree(assets / 'robot_configs', output / 'robot_configs')
+    shutil.copytree(assets / 'norm_stats', output / 'norm_stats')
     norm = output / 'norm_stats/robotwin.json'
     robot_path = output / 'robot_configs/robotwin.yaml'
     robot = yaml.safe_load(robot_path.read_text())
@@ -38,11 +46,11 @@ def main():
     runtime_model = output / 'checkpoints/global_step_10000/hf_ckpt'
     runtime_model.mkdir(parents=True)
     for item in model.iterdir():
-        if item.is_file():
+        if item.is_file() and (not flat or item.name not in ('README.md','manifest.json','provenance.json','export_verification.json','lingbotvla_cli.yaml')):
             (runtime_model / item.name).symlink_to(item)
     original_robot = source / 'configs/robot_configs/robotwin.yaml'
     matches = original_robot.is_file() and yaml.safe_load(original_robot.read_text()) == yaml.safe_load(
-        (bundle / 'inference_fp32/robot_configs/robotwin.yaml').read_text())
+        (assets / 'robot_configs/robotwin.yaml').read_text())
     print('Runtime config:', output / 'lingbotvla_cli.yaml')
     print('QWEN3VL_PATH:', qwen)
     print('Runtime model path:', runtime_model)

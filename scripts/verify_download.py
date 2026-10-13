@@ -11,6 +11,8 @@ parser.add_argument('--package', choices=['inference', 'resume', 'all'], default
 args = parser.parse_args()
 root = args.bundle.resolve()
 manifest = json.loads((root / 'manifest.json').read_text())
+if manifest.get('package') == 'inference-root' and args.package == 'resume':
+    raise ValueError('This inference-only repository does not contain optimizer or resume state')
 checked = skipped = 0
 missing = []
 for item in manifest['files']:
@@ -18,7 +20,7 @@ for item in manifest['files']:
     if not path.is_relative_to(root):
         raise ValueError('Unsafe manifest path')
     if not path.is_file():
-        required = args.package == 'all' or (
+        required = args.package == 'all' or (manifest.get('package') == 'inference-root' and args.package == 'inference') or (
             args.package == 'inference' and item['path'].startswith(
                 ('inference_fp32/', 'qwen3vl_config_tokenizer/'))) or (
             args.package == 'resume' and item['path'].startswith('resume_dcp/'))

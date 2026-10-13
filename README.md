@@ -2,11 +2,16 @@
 
 本仓库记录第一阶段 AMD 八卡全参数训练的 **global_step_10000**。配置、脚本、逐任务评测结果公开供团队复现与分析。
 
-模型下载：[Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k](https://huggingface.co/Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k)。大文件分批上传，以 HF 文件清单、校验值及实际下载完整性为准。
+模型分成两个公开仓库，大文件分批上传，以各仓库文件清单、校验值及实际下载完整性为准：
 
-| HF 子目录 | 内容 | 用途 |
+- [完整状态续训包](https://huggingface.co/Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k)：原始 DCP 分片、优化器、训练状态及原配置，约76.62GB。
+- [FP32 推理权重包](https://huggingface.co/Fantasyyy/SDUF-Team-Lingbot-vla-2-competition-10k-fp32)：safetensors 和索引放在根目录，含配置、tokenizer、机器人映射和归一化统计，约25.54GB。不含优化器；用于评测或从权重初始化新训练。
+
+上传过程中仓库可访问不等于权重已齐。FP32包需下载全部6个safetensors分片并校验；续训包需保留全部 model、optimizer、extra_state 文件。原合并式本地目录仍保留，不删除源文件。
+
+| 包/目录 | 内容 | 用途 |
 |---|---|---|
-| `inference_fp32/` | 原始 10k 权重保留 FP32 后导出的 safetensors、tokenizer、模型与推理配置 | 加载评测，或从 10k 权重初始化新的训练分支 |
+| 新FP32仓库根目录（本地旧包为 `inference_fp32/`） | 原始 10k 权重保留 FP32 后导出的 safetensors、tokenizer、模型与推理配置 | 加载评测，或从 10k 权重初始化新的训练分支 |
 | `resume_dcp/` | `global_step_10000/{model,optimizer,extra_state}`、原训练配置、model_assets | 在兼容环境中恢复完整训练状态 |
 | `qwen3vl_config_tokenizer/` | Qwen3-VL-4B-Instruct 的架构与处理器配置，不含另一份 Qwen 权重 | LingBot 加载器的配置依赖 |
 
